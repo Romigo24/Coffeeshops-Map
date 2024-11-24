@@ -6,12 +6,6 @@ import os
 from dotenv import load_dotenv
 
 
-load_dotenv()
-
-
-YANDEX_API = os.environ['YANDEX_API_KEY']
-
-
 def fetch_coordinates(apikey, address):
     base_url = "https://geocode-maps.yandex.ru/1.x"
     response = requests.get(base_url, params={
@@ -35,9 +29,10 @@ def get_coffeeshop_distance(coffeeshop):
 
 
 def main():
-
+    load_dotenv()
+    apikey = os.environ['YANDEX_API_KEY']
     adress = input('Где вы находитесь?')
-    coords = fetch_coordinates(YANDEX_API, adress)
+    coords = fetch_coordinates(apikey, adress)
     with open("coffee.json", "r", encoding='CP1251') as my_file:
         contents_json = my_file.read()
     file_contents = json.loads(contents_json)
