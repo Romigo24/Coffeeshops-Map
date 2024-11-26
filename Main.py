@@ -21,7 +21,7 @@ def fetch_coordinates(apikey, address):
 
     most_relevant = found_places[0]
     lon, lat = most_relevant['GeoObject']['Point']['pos'].split(" ")
-    return lon, lat
+    return lat, lon
 
 
 def get_coffeeshop_distance(coffeeshop):
@@ -42,8 +42,8 @@ def main():
     for coffee in file_contents:
         coffeeshop = dict()
         coffeeshop['Name'] = coffee['Name']
-        coords_coffeeshop = coffee['Longitude_WGS84'], coffee['Latitude_WGS84']
-        coffeeshop['Distance'] = (distance.distance(coords[-90:90],
+        coords_coffeeshop = coffee['Latitude_WGS84'], coffee['Longitude_WGS84']
+        coffeeshop['Distance'] = (distance.distance(coords,
                                                     coords_coffeeshop).km)
         coffeeshop['Latitude'] = coffee['Latitude_WGS84']
         coffeeshop['Longitude'] = coffee['Longitude_WGS84']
@@ -51,48 +51,24 @@ def main():
 
     sorted_coffeeshop = sorted(coffee_information, key=get_coffeeshop_distance)
     first_coffeeshop = sorted_coffeeshop[:5]
-    
-    m = folium.Map(coords[-90:90], zoom_start=12)
+
+    m = folium.Map(coords, zoom_start=12)
 
     folium.Marker(
-        location=(first_coffeeshop[0]['Latitude'],
-                  first_coffeeshop[0]['Longitude']),
-        tooltip='Click me!',
-        popup=first_coffeeshop[0]['Name'],
-        icon=folium.Icon(color='red'),
+        location = coords,
+        tooltip = 'Click me!',
+        popup = 'Me',
+        icon = folium.Icon(icon='user', color='blue'),
     ).add_to(m)
 
-    folium.Marker(
-        location=(first_coffeeshop[1]['Latitude'],
-                  first_coffeeshop[1]['Longitude']),
-        tooltip='Click me!',
-        popup=first_coffeeshop[1]['Name'],
-        icon=folium.Icon(color='red'),
-    ).add_to(m)
-
-    folium.Marker(
-        location=(first_coffeeshop[2]['Latitude'],
-                  first_coffeeshop[2]['Longitude']),
-        tooltip='Click me!',
-        popup=first_coffeeshop[2]['Name'],
-        icon=folium.Icon(color='red'),
-    ).add_to(m)
-
-    folium.Marker(
-        location=(first_coffeeshop[3]['Latitude'],
-                  first_coffeeshop[3]['Longitude']),
-        tooltip='Click me!',
-        popup=first_coffeeshop[3]['Name'],
-        icon=folium.Icon(color='red'),
-    ).add_to(m)
-
-    folium.Marker(
-        location=(first_coffeeshop[4]['Latitude'],
-                  first_coffeeshop[4]['Longitude']),
-        tooltip='Click me!',
-        popup=first_coffeeshop[4]['Name'],
-        icon=folium.Icon(color='red'),
-    ).add_to(m)
+    for coffeeshop in first_coffeeshop:
+        folium.Marker(
+            location = (coffeeshop['Latitude'],
+                      coffeeshop['Longitude']),
+            tooltip = 'Click me!',
+            popup = coffeeshop['Name'],
+            icon = folium.Icon(color='red'),
+        ).add_to(m)
     m.save('coffeeshops.html')
 
 if __name__ == '__main__':
